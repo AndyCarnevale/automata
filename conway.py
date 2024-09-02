@@ -13,15 +13,15 @@ def create_random_state(size: Tuple[int, int], prob: float = 0.2) -> np.ndarray:
     """Create a random initial state of x by y grid"""
     return np.random.choice([False, True], size=size, p=[1-prob, prob])
 
-class Simulation:
+class SimulationModel:
     def __init__(self, size: Tuple[int, int]) -> None:
         self.size = size
         self.state = create_random_state(size)
-        
+
     def update(self) -> None:
         self.state = conway_step(self.state)
 
-class Renderer:
+class SimulationView:
     def __init__(self, window_size: Tuple[int, int]) -> None:
         self.window_size = window_size
         self.screen: pygame.surface.Surface = pygame.display.set_mode(window_size)
@@ -31,24 +31,33 @@ class Renderer:
         pygame.surfarray.blit_array(self.screen, state * 0xFFFFFF)
         pygame.display.flip()
 
-def main() -> None:
-    width: int = 1000
-    height: int = 1000
-    conway: Simulation = Simulation((width, height))
-    renderer: Renderer = Renderer((width, height))
+class SimulationController:
+    def __init__(self, size: Tuple[int, int]) -> None:
+        self.size = size
+        self.model = SimulationModel(size)
+        self.view = SimulationView(size)
 
-    pygame.init()
-    clock: pygame.time.Clock = pygame.time.Clock()
+        pygame.init()
+        self.clock: pygame.time.Clock = pygame.time.Clock()
 
-    running = True
-    while running:
+    def handle_events(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-        conway.update()
-        renderer.draw(conway.state)
+                pygame
 
-        clock.tick(10)  # Limit to 10 frames per second
+    def update(self) -> None:
+        self.model.update()
+        self.view.draw(self.model.state)
+        self.clock.tick(10)
+
+def main():
+    width: int = 1000
+    height: int = 1000
+    controller = SimulationController((width, height))
+    running = True
+    while running:
+        controller.handle_events()
+        controller.update()
 
     pygame.quit()
 
