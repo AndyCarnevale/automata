@@ -50,6 +50,9 @@ class SimulationController:
         self.view.draw(self.model.state)
         self.clock.tick(10)
 
+    def close(self) -> None:
+        pygame.quit()
+
 def main():
     width: int = 1000
     height: int = 1000
@@ -59,7 +62,7 @@ def main():
         controller.handle_events()
         controller.update()
 
-    pygame.quit()
+    controller.close()
 
 if __name__ == "__main__":
     main()
