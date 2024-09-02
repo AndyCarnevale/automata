@@ -16,14 +16,15 @@ class UpdateRule(ABC):
 class RandomInit(InitialStateRule):
     def __init__(self, p: float = 0.5) -> None:
         self.p = p
+
     def rule(self, size) -> np.ndarray:
-        return np.random.choice([0, 1], size=size, p=[1-self.p, self.p])
+        return np.random.choice([0, 1], size=size, p=[1 - self.p, self.p])
 
 class ConwayUpdate(UpdateRule):
     def update(self, current_state: np.ndarray) -> np.ndarray:
         neighbors_count = sum(np.roll(np.roll(current_state, i, 0), j, 1)
-                for i in (-1, 0, 1) for j in (-1, 0, 1)
-                if (i != 0 or j != 0))
+                              for i in (-1, 0, 1) for j in (-1, 0, 1)
+                              if (i != 0 or j != 0))
         return (neighbors_count == 3) | (current_state & (neighbors_count == 2))
 
 class SimulationModel:
@@ -61,7 +62,7 @@ class SimulationController:
     def handle_events(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame
+                pygame.quit()
 
     def update(self) -> None:
         self.model.update()
@@ -85,9 +86,9 @@ def main():
 
     controller = SimulationController(model, view)
 
-    running = True
-    while running:
-        controller.handle_events()
+    is_running = True
+    while is_running:
+        is_running = controller.handle_events()
         controller.update()
 
     controller.close()
