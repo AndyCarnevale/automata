@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+import pygame
 
 def conway_step(X):
     """Conway's Game of Life step using numpy array X"""
@@ -10,14 +10,28 @@ def conway_step(X):
 
 def create_random_state(x, y, prob=0.5):
     """Create a random initial state of x by y grid"""
-    return np.random.choice([False, True], size=(x, y), p=[prob, 1-prob])
+    return np.random.choice([False, True], size=(x, y), p=[1-prob, prob])
 
-def conway_game(x=100, y=100, steps=100, prob=0.5):
-    """Run Conway's Game of Life on x by y grid for steps"""
-    X = create_random_state(x, y, prob)
-    for _ in range(steps):
-        X = conway_step(X)
-        plt.imshow(X, cmap='Greys', interpolation='nearest')
-        plt.show()
+height, width = 1000, 1000
+X = create_random_state(height, width, prob=0.2)
 
-conway_game()
+pygame.init()
+screen = pygame.display.set_mode((width, height))
+surface = pygame.Surface((width, height))
+clock = pygame.time.Clock()
+
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    
+    X = conway_step(X)
+    
+    pygame.surfarray.blit_array(surface, X * 0xFFFFFF)
+    screen.blit(surface, (0, 0))
+    
+    pygame.display.flip()
+    clock.tick(10)  # Limit to 10 frames per second
+
+pygame.quit()
