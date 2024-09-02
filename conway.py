@@ -21,24 +21,36 @@ class Simulation:
     def update(self) -> None:
         self.state = conway_step(self.state)
 
-width: int = 1000
-height: int = 1000
-conway: Simulation = Simulation((width, height))
+class Renderer:
+    def __init__(self, window_size: Tuple[int, int]) -> None:
+        self.window_size = window_size
+        self.screen: pygame.surface.Surface = pygame.display.set_mode(window_size)
+        self.clock: pygame.time.Clock = pygame.time.Clock()
 
-pygame.init()
-screen: pygame.surface.Surface = pygame.display.set_mode((width, height))
-clock: pygame.time.Clock = pygame.time.Clock()
+    def draw(self, state: np.ndarray) -> None:
+        pygame.surfarray.blit_array(self.screen, state * 0xFFFFFF)
+        pygame.display.flip()
 
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    conway.update()
+def main() -> None:
+    width: int = 1000
+    height: int = 1000
+    conway: Simulation = Simulation((width, height))
+    renderer: Renderer = Renderer((width, height))
 
-    pygame.surfarray.blit_array(screen, conway.state * 0xFFFFFF)
+    pygame.init()
+    clock: pygame.time.Clock = pygame.time.Clock()
 
-    pygame.display.flip()
-    clock.tick(10)  # Limit to 10 frames per second
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        conway.update()
+        renderer.draw(conway.state)
 
-pygame.quit()
+        clock.tick(10)  # Limit to 10 frames per second
+
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
